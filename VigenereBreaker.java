@@ -31,6 +31,7 @@ public class VigenereBreaker {
     }
     
     //find the most common character in a dictionary of words
+    //initial value 'g' is arbitrary
     public char mostCommonCharIn(HashSet<String> dictionary) {
         HashMap<Character,Integer> charCount = new HashMap<>();
         char mostCommon = 'g';
@@ -69,6 +70,8 @@ public class VigenereBreaker {
         return realWords;
     }
     
+    //for each language, determine which one has the most "real words" when "best key" is
+    //determined using breakForLanguage method
     public void breakForAllLangs(String encrypted, HashMap<String,HashSet<String>> langs) {
         int bestWordCount = 0;
         String bestDecrypt = null;
@@ -88,7 +91,7 @@ public class VigenereBreaker {
     }
     
     //given a language, find the best key for that language
-    //best key based on counting the highest number of "real words"
+    //best key is based on counting the highest number of "real words"
     public String breakForLanguage (String encrypted, HashSet dictionary) {
         int bestWords = 0;
         int keyLength = 0;
@@ -113,7 +116,7 @@ public class VigenereBreaker {
         return result;
     }
     
-    //
+    //builds and returns a string from every [totalSlices]th character in the string "message"
     public String sliceString(String message, int whichSlice, int totalSlices) {
         StringBuilder slice = new StringBuilder();
         
@@ -123,7 +126,11 @@ public class VigenereBreaker {
         message = slice.toString();
         return message;
     }
-
+    //called by breakForLanguage, then calls sliceString to create [klength]
+    //number of strings, each consisting of every [klength]th character in
+    //the encrypted message. Then uses a CaesarCracker object to decrypt
+    //each string and return the key for each of them, thus providing the 
+    //int[] key for the 
     public int[] tryKeyLength(String encrypted, int klength, char mostCommon) {
         int[] key = new int[klength];
         String[] slices = new String[klength];
@@ -132,7 +139,7 @@ public class VigenereBreaker {
             slices[k] = sliceString(encrypted, k, klength);
             ++k;
         }
-        CaesarCracker crack = new CaesarCracker();
+        CaesarCracker crack = new CaesarCracker(mostCommon);
         for (int i=0; i < klength; ++i) {
             key[i] = crack.getKey(slices[i]);
         }
@@ -140,7 +147,7 @@ public class VigenereBreaker {
     }
 
     public void breakVigenere () {
-        FileResource encrypted = new FileResource("secretmessage3.txt");
+        FileResource encrypted = new FileResource("secretmessage4.txt");
         String input = encrypted.asString();
         HashMap<String, HashSet<String>> dics = new HashMap<>();
         DirectoryResource d = new DirectoryResource(); //ask for dictionaries
@@ -153,6 +160,3 @@ public class VigenereBreaker {
     }
     
 }
-
-//La chambre à coucher de Juliette.
-//Drei Hexen treten auf.
